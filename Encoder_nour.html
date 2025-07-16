@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔐 أداة تشفير JavaScript المتقدمة - Eng Ahmed</title>
+
+    <!-- مكتبة Obfuscator -->
+    <script src="assits/index.browser.js"></script>
+
+    <!-- CodeMirror (محرر كود احترافي) -->
+    <link rel="stylesheet" href="assits/codemirror.min.css" />
+    <script src="assits/codemirror.min.js"></script>
+    <script src="assits/javascript.min.js"></script>
+    <link rel="stylesheet" href="assits/show-hint.css" />
+    <script src="assits/show-hint.js"></script>
+    <script src="assits/javascript-hint.js"></script>
+    <link rel="stylesheet" href="assits/dracula.css" />
+    <link rel="stylesheet" href="assits/eclipse.css" />
+
+    <!-- خطوط Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet" />
+
+    <!-- أيقونات Font Awesome -->
+    <link rel="stylesheet" href="../assits/all.min.css" />
+
+    <style>
+      :root {
+        --primary-color: #678a92;
+        --primary-dark: #1a95c5;
+        --secondary-color: #ff6b6b;
+        --bg-light: #f8f9fa;
+        --bg-card-light: #ffffff;
+        --text-light: #2d3748;
+        --text-secondary-light: #4a5568;
+        --border-light: #e2e8f0;
+        --bg-dark: #1a202c;
+        --bg-card-dark: #2d3748;
+        --text-dark: #f7fafc;
+        --text-secondary-dark: #cbd5e0;
+        --border-dark: #4a5568;
+        --success-color: #48bb78;
+        --warning-color: #ed8936;
+        --error-color: #f56565;
+        --border-radius: 12px;
+        --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Tajawal', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: var(--bg-light);
+        color: var(--text-light);
+        transition: var(--transition);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo i {
+        font-size: 28px;
+        color: var(--primary-color);
+      }
+
+      .logo h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .controls {
+        display: flex;
+        gap: 15px;
+      }
+
+      .card {
+        background: var(--bg-card-light);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 20px;
+        margin-bottom: 25px;
+        transition: var(--transition);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: var(--transition);
+        font-family: 'Tajawal', sans-serif;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background: var(--secondary-color);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .btn-outline:hover {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
+
+      .CodeMirror {
+        height: auto;
+        border-radius: 8px;
+        font-size: 15px;
+        border: 1px solid var(--border-light);
+      }
+
+      .CodeMirror pre {
+        font-family: 'Fira Code', 'Courier New', monospace;
+      }
+
+      .dark-mode {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+      }
+
+      .dark-mode .card {
+        background: var(--bg-card-dark);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2),
+          0 2px 4px -1px rgba(0, 0, 0, 0.12);
+      }
+
+      .dark-mode .CodeMirror {
+        background-color: var(--bg-card-dark);
+        color: var(--text-dark);
+        border-color: var(--border-dark);
+      }
+
+      .dark-mode header {
+        border-bottom-color: var(--border-dark);
+      }
+
+      .dark-mode .card-title {
+        color: var(--primary-color);
+      }
+
+      footer {
+        margin-top: 50px;
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: var(--text-secondary-light);
+        border-top: 1px solid var(--border-light);
+      }
+
+      .dark-mode footer {
+        color: var(--text-secondary-dark);
+        border-top-color: var(--border-dark);
+      }
+
+      .options-panel {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(74, 107, 255, 0.05);
+        border-radius: var(--border-radius);
+        border: 1px dashed var(--primary-color);
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .option-item input[type='checkbox'] {
+        width: 18px;
+        height: 18px;
+      }
+
+      .status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        font-size: 14px;
+        color: var(--text-secondary-light);
+      }
+
+      .dark-mode .status-bar {
+        color: var(--text-secondary-dark);
+      }
+
+      .copy-btn {
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-size: 18px;
+        transition: var(--transition);
+      }
+
+      .copy-btn:hover {
+        color: var(--primary-dark);
+        transform: scale(1.1);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--success-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        z-index: 1000;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          gap: 15px;
+          align-items: flex-start;
+        }
+
+        .controls {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .options-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <i class="fas fa-lock"></i>
+          <h1>أداة تشفير JavaScript</h1>
+        </div>
+        <div class="controls">
+          <button class="btn btn-outline" onclick="toggleMode()">
+            <i class="fas fa-moon"></i> تغيير الوضع
+          </button>
+          <button class="btn btn-outline" onclick="resetAll()">
+            <i class="fas fa-redo"></i> إعادة تعيين
+          </button>
+        </div>
+      </header>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-code"></i>
+            الكود الأصلي
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-outline" onclick="formatCode()">
+              <i class="fas fa-align-left"></i> تنسيق
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="clearInput()">
+              <i class="fas fa-trash"></i> مسح
+            </button>
+          </div>
+        </div>
+        <textarea id="inputCode">
+// اكتب كود JavaScript هنا
+function example() {
+  console.log('مرحباً بالعالم!');
+  return 'شكراً لاستخدام الأداة';
+}</textarea
+        >
+      </div>
+
+      <div class="options-panel">
+        <div class="card-title">
+          <i class="fas fa-cog"></i>
+          خيارات التشفير
+        </div>
+        <div class="options-grid">
+          <div class="option-item">
+            <input type="checkbox" id="compact" checked />
+            <label for="compact">ضغط الكود</label>
+          </div>
+          <div class="option-item">
+            <input type="checkbox" id="controlFlow" checked />
+            <label for="controlFlow">تشويش تدفق التحكم</label>
+          </div>
+          <div class="option-item">
+            <input type="checkbox" id="stringArray" checked />
+            <label for="stringArray">مصفوفة السلاسل</label>
+          </div>
+          <div class="option-item">
+            <input type="checkbox" id="debugProtection" />
+            <label for="debugProtection">حماية ضد التصحيح</label>
+          </div>
+          <div class="option-item">
+            <input type="checkbox" id="disableConsole" />
+            <label for="disableConsole">تعطيل الكونسول</label>
+          </div>
+          <div class="option-item">
+            <input type="checkbox" id="unicodeEscape" />
+            <label for="unicodeEscape">تحويل إلى يونيكود</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons" style="text-align: center; margin: 25px 0">
+        <button class="btn btn-primary" onclick="encryptCode()">
+          <i class="fas fa-lock"></i> تشفير الكود
+        </button>
+        <button class="btn btn-secondary" onclick="copyOutput()">
+          <i class="fas fa-copy"></i> نسخ الناتج
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-lock"></i>
+            الكود المشفر
+          </div>
+          <div class="card-actions">
+            <button class="copy-btn" onclick="copyOutput()" title="نسخ الكود">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+        <textarea id="outputCode"></textarea>
+        <div class="status-bar">
+          <span id="status">جاهز للتشفير</span>
+          <span id="code-size">0 حرف</span>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          تم تطوير الأداة بواسطة
+          <strong>تم بفضل الله | أحمد عبد الظاهر</strong> &copy;
+          <span id="year"></span>
+        </p>
+        <p>جميع الحقوق محفوظة - إصدار 1.0.0</p>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast">تم النسخ إلى الحافظة!</div>
+
+    <script>
+      let inputEditor, outputEditor;
+      let isDark = localStorage.getItem('darkMode') === 'true';
+      let toastTimer;
+
+      window.onload = function () {
+        // تعيين سنة التذييل
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // تهيئة المحررين
+        inputEditor = CodeMirror.fromTextArea(
+          document.getElementById('inputCode'),
+          {
+            mode: 'javascript',
+            theme: isDark ? 'dracula' : 'eclipse',
+            lineNumbers: true,
+            lineWrapping: true,
+            extraKeys: { 'Ctrl-Space': 'autocomplete' },
+            indentUnit: 4,
+            tabSize: 4,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+          }
+        );
+
+        outputEditor = CodeMirror.fromTextArea(
+          document.getElementById('outputCode'),
+          {
+            mode: 'javascript',
+            theme: isDark ? 'dracula' : 'eclipse',
+            lineNumbers: true,
+            readOnly: true,
+            lineWrapping: true,
+          }
+        );
+
+        // تطبيق وضع الظلام إذا كان مفعل
+        if (isDark) {
+          document.body.classList.add('dark-mode');
+        }
+
+        // تحديث حجم الكود
+        updateCodeSize();
+        inputEditor.on('change', updateCodeSize);
+      };
+
+      function encryptCode() {
+        try {
+          const input = inputEditor.getValue();
+          if (!input.trim()) {
+            showStatus('يرجى إدخال كود لتشفيره', 'error');
+            return;
+          }
+
+          showStatus('جاري التشفير...', 'warning');
+
+          const options = {
+            compact: document.getElementById('compact').checked,
+            controlFlowFlattening:
+              document.getElementById('controlFlow').checked,
+            controlFlowFlatteningThreshold: 0.75,
+            stringArray: document.getElementById('stringArray').checked,
+            stringArrayEncoding: ['rc4'],
+            stringArrayThreshold: 0.75,
+            debugProtection: document.getElementById('debugProtection').checked,
+            disableConsoleOutput:
+              document.getElementById('disableConsole').checked,
+            unicodeEscapeSequence:
+              document.getElementById('unicodeEscape').checked,
+          };
+
+          const obfuscated = JavaScriptObfuscator.obfuscate(input, options);
+          outputEditor.setValue(obfuscated.getObfuscatedCode());
+
+          showStatus('تم التشفير بنجاح!', 'success');
+          updateCodeSize();
+        } catch (error) {
+          console.error(error);
+          showStatus('حدث خطأ أثناء التشفير: ' + error.message, 'error');
+        }
+      }
+
+      function toggleMode() {
+        isDark = !isDark;
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+
+        const theme = isDark ? 'dracula' : 'eclipse';
+        inputEditor.setOption('theme', theme);
+        outputEditor.setOption('theme', theme);
+      }
+
+      function copyOutput() {
+        const output = outputEditor.getValue();
+        if (!output.trim()) {
+          showStatus('لا يوجد كود مشفر للنسخ', 'error');
+          return;
+        }
+
+        navigator.clipboard
+          .writeText(output)
+          .then(() => {
+            showToast('تم النسخ إلى الحافظة!');
+          })
+          .catch((err) => {
+            showStatus('فشل النسخ: ' + err, 'error');
+          });
+      }
+
+      function clearInput() {
+        inputEditor.setValue('');
+        updateCodeSize();
+        showStatus('تم مسح الكود المدخل', 'success');
+      }
+
+      function resetAll() {
+        inputEditor.setValue(
+          "// اكتب كود JavaScript هنا\nfunction example() {\n  console.log('مرحباً بالعالم!');\n  return 'شكراً لاستخدام الأداة';\n}"
+        );
+        outputEditor.setValue('');
+        document
+          .querySelectorAll('.options-panel input[type="checkbox"]')
+          .forEach((checkbox) => {
+            checkbox.checked =
+              checkbox.id === 'compact' ||
+              checkbox.id === 'controlFlow' ||
+              checkbox.id === 'stringArray';
+          });
+        updateCodeSize();
+        showStatus('تم إعادة تعيين كل شيء', 'success');
+      }
+
+      function formatCode() {
+        const code = inputEditor.getValue();
+        if (!code.trim()) {
+          showStatus('لا يوجد كود لتنسيقه', 'error');
+          return;
+        }
+
+        try {
+          // هذا مثال بسيط للتنسيق، في التطبيق الحقيقي يمكن استخدام مكتبة مثل prettier
+          const formatted = js_beautify(code, {
+            indent_size: 2,
+            space_in_empty_paren: true,
+          });
+          inputEditor.setValue(formatted);
+          showStatus('تم تنسيق الكود', 'success');
+        } catch (e) {
+          showStatus('خطأ في تنسيق الكود: ' + e.message, 'error');
+        }
+      }
+
+      function updateCodeSize() {
+        const code = inputEditor.getValue();
+        const size = code.length;
+        document.getElementById(
+          'code-size'
+        ).textContent = `${size.toLocaleString()} حرف`;
+      }
+
+      function showStatus(message, type) {
+        const statusElement = document.getElementById('status');
+        statusElement.textContent = message;
+
+        // إزالة جميع ألوان الحالة السابقة
+        statusElement.style.color = '';
+
+        // تطبيق لون حسب نوع الحالة
+        switch (type) {
+          case 'success':
+            statusElement.style.color = 'var(--success-color)';
+            break;
+          case 'error':
+            statusElement.style.color = 'var(--error-color)';
+            break;
+          case 'warning':
+            statusElement.style.color = 'var(--warning-color)';
+            break;
+        }
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+
+      // دالة لتنظيم النص (يمكن استبدالها بمكتبة js-beautify في الإنتاج)
+      function js_beautify(code, options) {
+        // هذه دالة مبسطة، في التطبيق الحقيقي استخدم مكتبة متخصصة
+        try {
+          // محاولة تقسيم الأسطر وإعادة المسافات البادئة
+          let lines = code.split('\n');
+          let indent = 0;
+          let result = [];
+
+          for (let line of lines) {
+            line = line.trim();
+            if (line.endsWith('}') || line.endsWith('};')) indent--;
+
+            if (line) {
+              result.push('  '.repeat(indent) + line);
+            } else {
+              result.push('');
+            }
+
+            if (
+              line.endsWith('{') ||
+              line.startsWith('case') ||
+              line.endsWith(':')
+            )
+              indent++;
+          }
+
+          return result.join('\n');
+        } catch (e) {
+          throw new Error('فشل في تنسيق الكود');
+        }
+      }
+    </script>
+  </body>
+</html>
